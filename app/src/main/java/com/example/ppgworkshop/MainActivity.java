@@ -211,7 +211,7 @@ public class MainActivity extends Activity {
         }
 
         String ext = extensionFromUrl(fileUrl);
-        String safeTitle = title.replaceAll("[\\\\/:*?\\"<>|]", "_").trim();
+        String safeTitle = title.replaceAll("[^A-Za-z0-9._ -]", "_").trim();
         if (safeTitle.isEmpty()) safeTitle = "ppg-addon-" + id;
         if (safeTitle.length() > 90) safeTitle = safeTitle.substring(0, 90);
         String name = safeTitle + ext;
