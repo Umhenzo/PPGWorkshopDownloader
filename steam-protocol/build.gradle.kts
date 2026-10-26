@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.protobuf")
 }
-kotlin { jvmToolchain(17) }
+kotlin { jvmToolchain(21) }
 dependencies {
     api("com.google.protobuf:protobuf-javalite:4.29.1")
     implementation(platform("com.squareup.okhttp3:okhttp-bom:5.3.2"))

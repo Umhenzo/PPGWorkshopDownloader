@@ -47,11 +47,11 @@ class UgcWorkshopDownloader(
             val connectResult = runCatching { sessionConnector(session, cmServers) }
             connectResult
                 .onSuccess { log("Connected to Steam CM cell=${it.cellId} steamId=${it.steamId}") }
-                .onFailure {
+                .onFailure { error ->
                     if (allowPublicCdnFallbackOnSessionFailure) {
-                        log("Steam CM connection failed, continuing with public CDN flow: ${it.message}")
+                        log("Steam CM connection failed, continuing with public CDN flow: ${error.message}")
                     } else {
-                        throw it
+                        throw WorkshopDownloadException("Falha na conexão com os servidores da Steam CM: ${error.message}", error)
                     }
                 }
 
@@ -471,7 +471,8 @@ class UgcWorkshopDownloader(
             query = query,
             proxyServer = proxyServer,
             resolveAuthToken = { host ->
-                cdnAuthTokenCache[host] ?: contentClient.getCdnAuthToken(appId, depotId, host).token.also {
+                cdnAuthTokenCache.remove(host)
+                contentClient.getCdnAuthToken(appId, depotId, host).token.also {
                     cdnAuthTokenCache[host] = it
                 }
             },
