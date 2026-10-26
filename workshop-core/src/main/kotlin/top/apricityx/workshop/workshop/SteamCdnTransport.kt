@@ -133,7 +133,7 @@ internal class SteamCdnTransport(
             client.newCall(request).execute().use { response ->
                 when {
                     response.isSuccessful -> return response.body?.bytes() ?: ByteArray(0)
-                    response.code == 403 && attempt == 0 && resolveAuthToken != null -> {
+                    (response.code == 401 || response.code == 403) && attempt == 0 && resolveAuthToken != null -> {
                         currentQuery = resolveAuthToken(server.host)
                     }
 
