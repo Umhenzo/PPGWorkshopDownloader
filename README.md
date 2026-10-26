@@ -1,11 +1,19 @@
 # PPG Workshop Downloader
 
-Android app prototype for downloading public People Playground Steam Workshop items to `Downloads/ppg`.
+Android app for downloading People Playground Steam Workshop items without requiring the user to sign in. The app resolves Workshop metadata and attempts the anonymous Steam CM / SteamPipe path when Steam does not provide a direct `file_url`.
+
+## Download location
+
+Downloaded files are exported to `Downloads/ppg/<addon title> (<Workshop ID>)/`.
 
 ## Build
 
-The GitHub Actions workflow in `.github/workflows/build-apk.yml` builds a debug APK. Open the **Actions** tab and select the workflow to run it.
+The GitHub Actions workflow `.github/workflows/build-apk.yml` builds the debug APK. Open the repository's **Actions** tab and download the `PPGWorkshopDownloader-debug-apk` artifact from a successful run.
 
-## Current limitation
+## Access limitations
 
-Steam Workshop does not expose a direct downloadable file URL for every item through its public details API. This prototype therefore does not yet support every workshop item. It is not a complete replacement for a Steam Workshop client.
+Anonymous access depends on Steam's response and each item's visibility/authorization. This app does not guarantee downloads for every Workshop item.
+
+## Third-party code
+
+The Steam protocol and Workshop download engine are adapted from [Apricityx/WorkshopAndroidDownloader](https://github.com/Apricityx/WorkshopAndroidDownloader), under Apache License 2.0. See `THIRD_PARTY_NOTICES.md` and `third_party/WorkshopOnAndroid-LICENSE`.
