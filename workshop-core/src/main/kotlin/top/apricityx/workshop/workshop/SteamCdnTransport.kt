@@ -126,6 +126,7 @@ internal class SteamCdnTransport(
         resolveAuthToken: (suspend (String) -> String)?,
     ): ByteArray {
         var currentQuery = query
+        var tokenFetchError: Throwable? = null
         repeat(2) { attempt ->
             val request = Request.Builder()
                 .url(buildRequestUrl(server, endpoint, path, currentQuery, proxyServer))
@@ -134,13 +135,28 @@ internal class SteamCdnTransport(
                 when {
                     response.isSuccessful -> return response.body?.bytes() ?: ByteArray(0)
                     (response.code == 401 || response.code == 403) && attempt == 0 && resolveAuthToken != null -> {
-                        currentQuery = resolveAuthToken(server.host)
+                        try {
+                            currentQuery = resolveAuthToken(server.host)
+                        } catch (error: Throwable) {
+                            tokenFetchError = error
+                            throw WorkshopDownloadException(
+                                "Falha ao obter token de autorização da Steam para o CDN (${server.host}): ${error.message}",
+                                error,
+                            )
+                        }
                     }
 
-                    else -> throw WorkshopDownloadException("Steam CDN request failed: ${response.code}")
+                    else -> {
+                        val detailMessage = if (response.code == 401 || response.code == 403) {
+                            "Steam CDN recusou a requisição (${response.code} Não Autorizado). O item pode ser privado ou exigir autorização."
+                        } else {
+                            "Steam CDN request failed: ${response.code}"
+                        }
+                        throw WorkshopDownloadException(detailMessage, tokenFetchError)
+                    }
                 }
             }
         }
-        throw WorkshopDownloadException("Steam CDN request exhausted retries")
+        throw WorkshopDownloadException("Steam CDN request exhausted retries", tokenFetchError)
     }
 }
